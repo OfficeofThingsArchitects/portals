@@ -76,7 +76,8 @@ void ofApp::update(){
 
     // Draw video into the FBO
     //movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
-    movie.draw(0, 0, fbo.getWidth(), fbo.getHeight());
+    //movie.draw(0, 0, fbo.getWidth(), fbo.getHeight());
+    movie.draw(0, 0, 1154, 1404);
 
     fbo.end();
 }
