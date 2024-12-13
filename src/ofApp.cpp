@@ -5,9 +5,13 @@ void ofApp::setup(){
     
     //get time
     previousMonth = -1;
-    currentMonth = (ofGetMinutes() % 12) + 1;//ofGetMonth();
+    currentMonth = ofGetMonth();
     previousDay = -1;
     currentDay = ofGetDay(); //1-31
+
+    demoMonth = (ofGetMinutes() % 12) + 1;
+    demoDay = (ofGetSeconds() % 30);
+    previousDemoMonth = 0;
 
     ofSetFullscreen(true);  // Set the application to fullscreen mode
     ofHideCursor(); //Hide the cursor
@@ -19,6 +23,9 @@ void ofApp::setup(){
     updateVideo(currentMonth);
 
     dotSize = 1.0;
+
+    //demo mode
+    demo = false;
 
     // Load shader
     shader.load("filter.vert", "filter.frag");
@@ -51,13 +58,35 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     //update time
-    currentMonth = (ofGetMinutes() % 12) + 1;//ofGetMonth();
-    currentDay = (ofGetSeconds() % 20); //ofGetDay();
+    // demoMonth = (ofGetMinutes() % 12) + 1;//ofGetMonth();
+    // demoDay = (ofGetSeconds() % 20); //ofGetDay();
+
+    //currentMonth = ofGetMonth();
+    //currentDay = ofGetDay();
+
+    static bool lastDemoMode = demo; // Track the previous demo mode
+
+    // Update time based on mode
+    if (!demo) {
+        currentMonth = ofGetMonth();
+        currentDay = ofGetDay();
+    } else {
+        currentMonth = (ofGetMinutes() % 12) + 1;
+        currentDay = (ofGetSeconds() % 30);
+    }
+
+    // Detect mode change and force updates
+    if (demo != lastDemoMode) {
+        lastDemoMode = demo;
+        updatePalette(currentDay);
+        updateVideo(currentMonth);
+        updateColors(currentMonth); // Ensure colors update on mode switch
+    }
 
     //update palette
-    if (ofGetSeconds() % 30 == 0) {
+    if (currentDay != previousDay) {
         previousDay = currentDay;
-        updatePalette(currentMonth);
+        updatePalette(currentDay);
     }
 
     //update video
@@ -66,6 +95,7 @@ void ofApp::update(){
         updateVideo(currentMonth);
         updateColors(currentMonth);
     }
+
 
     // Update the movie frame
     movie.update();
@@ -77,7 +107,7 @@ void ofApp::update(){
     // Draw video into the FBO
     //movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
     //movie.draw(0, 0, fbo.getWidth(), fbo.getHeight());
-    movie.draw(0, 0, 1154, 1404);
+    movie.draw(0, 0, 1152, 1404);
 
     fbo.end();
 }
@@ -113,14 +143,8 @@ void ofApp::keyPressed(int key){
         dotSize = 4.0;
     } else if (key == '4') {
         dotSize = 8.0;
-    } else if (key == 'w') {
-        updateColors(1);
-    } else if (key == 's') {
-        updateColors(4);
-    } else if (key == 'm') {
-        updateColors(7);
-    } else if (key == 'f') {
-        updateColors(10);
+    } else if (key == '9') {
+        demo = !demo;
     }
 }
 
@@ -171,22 +195,22 @@ void ofApp::updateColors(int pIdx) {
         colors[1] = ofVec3f(0.97, 0.68, 0.59);
         colors[2] = ofVec3f(0.98, 0.80, 0.72);
         colors[3] = ofVec3f(0.98, 0.92, 0.84);
-        colors[4] = ofVec3f(0.64, 0.64, 0.68);
-        colors[5] = ofVec3f(0.74, 0.74, 0.78);
-        colors[6] = ofVec3f(0.84, 0.84, 0.88);
-        colors[7] = ofVec3f(0.21, 0.45, 0.74);
-        colors[8] = ofVec3f(0.35, 0.55, 0.78);
-        colors[9] = ofVec3f(0.49, 0.64, 0.82);
-        colors[10] = ofVec3f(0.63, 0.70, 0.86);
-        colors[11] = ofVec3f(0.76, 0.80, 0.90);
-        colors[12] = ofVec3f(0.00, 0.53, 0.80);
-        colors[13] = ofVec3f(0.16, 0.61, 0.84);
-        colors[14] = ofVec3f(0.31, 0.72, 0.92);
-        colors[15] = ofVec3f(0.49, 0.80, 0.94);
-        colors[16] = ofVec3f(0.61, 0.86, 0.94);
-        colors[17] = ofVec3f(0.61, 0.61, 0.70);
-        colors[18] = ofVec3f(0.72, 0.72, 0.82);
-        colors[19] = ofVec3f(0.84, 0.84, 0.94);
+        colors[4] = ofVec3f(0.51, 0.51, 0.55);
+        colors[5] = ofVec3f(0.63, 0.64, 0.67);
+        colors[6] = ofVec3f(0.74, 0.78, 0.79);
+        colors[7] = ofVec3f(0.00, 0.20, 0.29);
+        colors[8] = ofVec3f(0.09, 0.29, 0.39);
+        colors[9] = ofVec3f(0.19, 0.39, 0.49);
+        colors[10] = ofVec3f(0.29, 0.49, 0.59);
+        colors[11] = ofVec3f(0.39, 0.59, 0.68);
+        colors[12] = ofVec3f(0.20, 0.55, 0.71);
+        colors[13] = ofVec3f(0.27, 0.63, 0.79);
+        colors[14] = ofVec3f(0.49, 0.80, 0.94);
+        colors[15] = ofVec3f(0.61, 0.86, 0.96);
+        colors[16] = ofVec3f(0.51, 0.64, 0.63);
+        colors[17] = ofVec3f(0.63, 0.76, 0.75);
+        colors[18] = ofVec3f(0.74, 0.88, 0.87);
+        colors[19] = ofVec3f(0.86, 1.00, 0.98);
     } else if (pIdx == 3 || pIdx == 4 || pIdx == 5) { //SPRING
         colors[0] = ofVec3f(0.80, 0.88, 0.55);
         colors[1] = ofVec3f(0.84, 0.92, 0.66);
@@ -230,26 +254,26 @@ void ofApp::updateColors(int pIdx) {
         colors[18] = ofVec3f(0.98, 0.82, 0.39);
         colors[19] = ofVec3f(0.98, 0.86, 0.59);
     } else if (pIdx == 9 || pIdx == 10 || pIdx == 11) { //FALL
-        colors[0] = ofVec3f(0.95, 0.53, 0.00);
-        colors[1] = ofVec3f(0.96, 0.63, 0.20);
-        colors[2] = ofVec3f(0.97, 0.72, 0.40);
-        colors[3] = ofVec3f(0.98, 0.81, 0.60);
-        colors[4] = ofVec3f(0.95, 0.48, 0.32);
-        colors[5] = ofVec3f(0.96, 0.59, 0.45);
-        colors[6] = ofVec3f(0.97, 0.69, 0.59);
-        colors[7] = ofVec3f(0.98, 0.79, 0.72);
-        colors[8] = ofVec3f(0.04, 0.54, 0.14);
-        colors[9] = ofVec3f(0.23, 0.63, 0.31);
-        colors[10] = ofVec3f(0.42, 0.72, 0.48);
-        colors[11] = ofVec3f(0.65, 0.83, 0.69);
-        colors[12] = ofVec3f(0.00, 0.30, 0.07);
-        colors[13] = ofVec3f(0.20, 0.45, 0.25);
-        colors[14] = ofVec3f(0.40, 0.58, 0.44);
-        colors[15] = ofVec3f(0.64, 0.75, 0.66);
-        colors[16] = ofVec3f(0.66, 0.27, 0.20);
-        colors[17] = ofVec3f(0.76, 0.43, 0.35);
-        colors[18] = ofVec3f(0.86, 0.59, 0.51);
-        colors[19] = ofVec3f(0.96, 0.74, 0.66);
+        colors[0] = ofVec3f(0.88, 0.53, 0.00);
+        colors[1] = ofVec3f(0.92, 0.61, 0.14);
+        colors[2] = ofVec3f(0.96, 0.69, 0.27);
+        colors[3] = ofVec3f(1.00, 0.77, 0.41);
+        colors[4] = ofVec3f(0.82, 0.48, 0.32);
+        colors[5] = ofVec3f(0.87, 0.59, 0.45);
+        colors[6] = ofVec3f(0.92, 0.69, 0.59);
+        colors[7] = ofVec3f(0.97, 0.80, 0.72);
+        colors[8] = ofVec3f(0.20, 0.47, 0.18);
+        colors[9] = ofVec3f(0.33, 0.57, 0.18);
+        colors[10] = ofVec3f(0.47, 0.63, 0.18);
+        colors[11] = ofVec3f(0.61, 0.72, 0.18);
+        colors[12] = ofVec3f(0.23, 0.29, 0.10);
+        colors[13] = ofVec3f(0.31, 0.39, 0.21);
+        colors[14] = ofVec3f(0.39, 0.49, 0.33);
+        colors[15] = ofVec3f(0.47, 0.59, 0.41);
+        colors[16] = ofVec3f(0.41, 0.27, 0.14);
+        colors[17] = ofVec3f(0.55, 0.43, 0.25);
+        colors[18] = ofVec3f(0.68, 0.59, 0.37);
+        colors[19] = ofVec3f(0.82, 0.74, 0.45);
     }
 }
 

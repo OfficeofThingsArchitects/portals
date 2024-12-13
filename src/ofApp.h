@@ -40,6 +40,10 @@ class ofApp : public ofBaseApp{
 		int currentMonth;
 		int previousDay;
 		int currentDay;
+		int demoMonth;
+		int previousDemoMonth;
+		int demoDay;
+		bool demo;
 		float dotSize;
 		
 };
