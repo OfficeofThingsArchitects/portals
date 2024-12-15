@@ -22,10 +22,11 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
 
 		void loadVideo(const std::string& fileName);  // Function to load a video
+		void resetVideo(); //resets current video
 		void updateVideo(int m);
 		void updateColors(int pIdx); //function to update the palette array
 		void updatePalette(int n);
-
+		
     ofVideoPlayer movie;  // Video player for the current video
     std::string currentVideoFile;  // Store the current video file name
 		ofFbo fbo;
@@ -40,9 +41,8 @@ class ofApp : public ofBaseApp{
 		int currentMonth;
 		int previousDay;
 		int currentDay;
-		int demoMonth;
-		int previousDemoMonth;
-		int demoDay;
+		int currentMinute;
+		int previousMinute;
 		bool demo;
 		float dotSize;
 		
