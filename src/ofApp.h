@@ -43,6 +43,7 @@ class ofApp : public ofBaseApp{
 		int currentDay;
 		int currentMinute;
 		int previousMinute;
+		float lastRestartTime;
 		bool demo;
 		float dotSize;
 		

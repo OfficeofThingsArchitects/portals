@@ -2,14 +2,16 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+    ofSetLogLevel(OF_LOG_VERBOSE);
 
     //get time
     previousMonth = -1;
     currentMonth = ofGetMonth();
     previousDay = -1;
     currentDay = ofGetDay(); //1-31
-    currentMinute = ofGetMinutes();
     previousMinute = -1;
+    currentMinute = ofGetMinutes();
+    lastRestartTime = 0.0f;
 
     ofSetFullscreen(true);  // Set the application to fullscreen mode
     ofHideCursor(); //Hide the cursor
@@ -36,7 +38,7 @@ void ofApp::setup(){
 
     //init palette
     for (int i = 0; i < 10; ++i) {
-        int randomIndex = static_cast<int>(floor( ofRandom(0, colors.size()) ) );
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, colors.size()) ));
         palette[i] = colors[randomIndex];
     }
 
@@ -77,14 +79,14 @@ void ofApp::update(){
     if (demo != lastDemoMode) {
         lastDemoMode = demo;
         updatePalette(currentDay);
-        //updateVideo(currentMonth);
+        updateVideo(currentMonth);
         updateColors(currentMonth); // Ensure colors update on mode switch
     }
 
     //update palette
     if (currentDay != previousDay) {
         previousDay = currentDay;
-        //updateVideo(currentMonth);
+        updateVideo(currentMonth);
         updatePalette(currentDay);
     }
 
@@ -95,24 +97,33 @@ void ofApp::update(){
     }
 
     //reset video
-    // if (ofGetSeconds() % 60 == 0) {
-    //     resetVideo();
+    // if (ofGetElapsedTimef() - lastRestartTime > 120) { // Restart every hour
+    //     movie.stop();
+    //     movie.load(currentVideoFile);
+    //     movie.play();
+    //     lastRestartTime = ofGetElapsedTimef();
     // }
+
+    //manual loop
+    if (movie.getIsMovieDone()) {
+        movie.setPosition(0); // Reset to the beginning
+        movie.play();
+    }
 
     // Get the current time in minutes
     currentMinute = ofGetMinutes();
 
     // Check if the minute has changed
-    if (currentMinute != previousMinute) {
-        previousMinute = currentMinute;  // Update the previous minute
+    // if (currentMinute != previousMinute) {
+    //     previousMinute = currentMinute;  // Update the previous minute
 
-        // Alternate between videos based on whether the minute is even or odd
-        if (currentMinute % 2 == 0) {
-            loadVideo("AA.mov");
-        } else {
-            loadVideo("A.mov");
-        }
-    }
+    //     // Alternate between videos based on whether the minute is even or odd
+    //     if (currentMinute % 2 == 0) {
+    //         loadVideo("F.mov");
+    //     } else {
+    //         loadVideo("J.mov");
+    //     }
+    // }
 
     // Update the movie frame
     movie.update();
@@ -186,7 +197,7 @@ void ofApp::loadVideo(const std::string& fileName) {
 
         currentVideoFile = fileName;   // Update the current video file
         if (movie.load(fileName)) {    // Load the new video
-            movie.setLoopState(OF_LOOP_NORMAL);  // Set to loop
+            //movie.setLoopState(OF_LOOP_NORMAL);  // Set to loop
             movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Texture optimization
             movie.play();  // Start playing the video
         } else {
@@ -199,7 +210,7 @@ void ofApp::resetVideo() {
         movie.stop();  // Stop the current video
         movie.close();  // Close the current video to free resources
         movie.load(currentVideoFile);  // Load the new video
-        movie.setLoopState(OF_LOOP_NORMAL);  // Set the video to loop
+        //movie.setLoopState(OF_LOOP_NORMAL);  // Set the video to loop
         movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Set nearest neighbor interpolation
         movie.play();  // Start playing the new video
 }
@@ -207,9 +218,9 @@ void ofApp::resetVideo() {
 void ofApp::updateVideo(int m) {
     if (m == 12) {
         // Create an array of video filenames
-        std::vector<std::string> options = {"A.mov", "D.mov", "F.mov"};
+        std::vector<std::string> options = {"A.mov", "D.mov", "F.mov"};//ADF
         // Generate a random index to select one of the options
-        int randomIndex = (int)floor( ofRandom(0, options.size()) );
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
         // Load the randomly selected video
         loadVideo(options[randomIndex]);
         //loadVideo("J.mov");//special
@@ -333,7 +344,7 @@ void ofApp::updatePalette(int n) {
     //std::shuffle(colors.begin(), colors.end(), std::default_random_engine(seed));
 
     for (int i = 0; i < 10; ++i) {
-        int randomIndex = static_cast<int>(floor( ofRandom(0, colors.size()) ));
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, colors.size()) ));
         palette[i] = colors[randomIndex];
     }
 }
