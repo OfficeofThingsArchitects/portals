@@ -14,7 +14,7 @@ void ofApp::setup(){
     lastRestartTime = 0.0f;
 
     ofSetFullscreen(true);  // Set the application to fullscreen mode
-    ofHideCursor(); //Hide the cursor
+    //ofHideCursor(); //Hide the cursor
 
     // Allocate the FBO with the same resolution as the window
     fbo.allocate(ofGetWidth(), ofGetHeight());
@@ -29,7 +29,6 @@ void ofApp::setup(){
 
     // Load shader
     shader.load("filter.vert", "filter.frag");
-
 
     //get the seasonal colors
     colors.resize(20);
@@ -174,6 +173,8 @@ void ofApp::keyPressed(int key){
         dotSize = 8.0;
     } else if (key == '9') {
         demo = !demo;
+    } else if (key == '0') {
+        resetVideo();
     }
 }
 
@@ -225,27 +226,60 @@ void ofApp::updateVideo(int m) {
         loadVideo(options[randomIndex]);
         //loadVideo("J.mov");//special
     } else if (m == 1) {
-        loadVideo("A2.mov");
+        //loadVideo("A2.mov");
+        std::vector<std::string> options = {"A.mov", "J.mov", "A.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 2) {
-        loadVideo("A.mov");
+        //loadVideo("A.mov");
+        std::vector<std::string> options = {"A.mov", "J.mov", "B.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 3) {
-        loadVideo("C.mov");
+        //loadVideo("C.mov");
+        std::vector<std::string> options = {"A.mov", "J.mov", "C.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 4) {
-        loadVideo("G.mov");//special
+        //loadVideo("G.mov");//special
+        std::vector<std::string> options = {"A.mov", "D.mov", "G.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 5) {
-        loadVideo("C.mov");
+        //loadVideo("C.mov");
+        std::vector<std::string> options = {"A.mov", "C.mov", "A.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 6) {
-        loadVideo("B.mov");
+        //loadVideo("B.mov");
+        std::vector<std::string> options = {"A.mov", "J.mov", "B.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 7) {
-        loadVideo("H.mov");//special
+        //loadVideo("H.mov");//special
+        std::vector<std::string> options = {"A.mov", "C.mov", "H.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 8) {
-        loadVideo("B.mov");
+        //loadVideo("B.mov");
+        std::vector<std::string> options = {"A.mov", "B.mov", "D.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 9) {
-        loadVideo("D.mov");
+        //loadVideo("D.mov");
+        std::vector<std::string> options = {"A.mov", "J.mov", "D.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 10) {
-        loadVideo("E.mov");//special
+        //loadVideo("E.mov");//special
+        std::vector<std::string> options = {"A.mov", "B.mov", "E.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     } else if (m == 11) {
-        loadVideo("D.mov");
+        //loadVideo("D.mov");
+        std::vector<std::string> options = {"A.mov", "C.mov", "D.mov"};
+        int randomIndex = static_cast<int>(std::floor( ofRandom(0, options.size()) ));
+        loadVideo(options[randomIndex]);
     }
 }
 
