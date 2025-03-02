@@ -14,24 +14,12 @@ void ofApp::setup(){
     lastRestartTime = 0.0f;
 
     ofSetFullscreen(true);  // Set the application to fullscreen mode
-    ofHideCursor(); //Hide the cursor
+    //ofHideCursor(); //Hide the cursor
 
     // Allocate the FBO with the same resolution as the window
     fbo.allocate(ofGetWidth(), ofGetHeight());
 
-    // Initialize with 3 video players for preloading
-    videos.resize(3);
-    
-    // Load the first video and start playing
-    // videos[0].load("A.mov");
-    // videos[0].setLoopState(OF_LOOP_NONE);
-    // videos[0].play();
-    
-    // Preload the second video
-    // videos[1].load("B.mov");
-    // videos[1].setLoopState(OF_LOOP_NONE);
-
-    // Initially load the first videos
+    // Initially load the first video
     updateVideo(currentMonth);
 
     dotSize = 1.0;
@@ -107,42 +95,37 @@ void ofApp::update(){
         updateColors(currentMonth);
     }
 
-    // Update all loaded videos
-    for (auto& video : videos) {
-        if (video.isLoaded()) {
-            video.update();
-        }
-    }
-    
-    // Check if the current video is finished
-    if (videos[currentVideoIndex].isLoaded() && videos[currentVideoIndex].getIsMovieDone()) {
-        // Stop the current video
-        videos[currentVideoIndex].stop();
-        videos[currentVideoIndex].close();
-        
-        // Switch to the next video
-        int oldIndex = currentVideoIndex;
-        currentVideoIndex = nextVideoIndex;
-        
-        // Start playing the next video
-        videos[currentVideoIndex].play();
-        
-        // Calculate the new "next" index
-        nextVideoIndex = (nextVideoIndex + 1) % 3;
-        
-        // Load the next video in line
-        videos[nextVideoIndex].load(currentVideoFile);
-        videos[nextVideoIndex].setLoopState(OF_LOOP_NONE);
-        
+    //reset video
+    // if (ofGetElapsedTimef() - lastRestartTime > 120) { // Restart every hour
+    //     movie.stop();
+    //     movie.load(currentVideoFile);
+    //     movie.play();
+    //     lastRestartTime = ofGetElapsedTimef();
+    // }
+
+    //manual loop
+    if (movie.getIsMovieDone()) {
+        movie.setPosition(0); // Reset to the beginning
+        movie.play();
     }
 
-}
+    // Get the current time in minutes
+    currentMinute = ofGetMinutes();
 
-//--------------------------------------------------------------
-void ofApp::draw(){
-    // Get the window dimensions
-    float windowWidth = ofGetWidth();
-    float windowHeight = ofGetHeight();
+    // Check if the minute has changed
+    // if (currentMinute != previousMinute) {
+    //     previousMinute = currentMinute;  // Update the previous minute
+
+    //     // Alternate between videos based on whether the minute is even or odd
+    //     if (currentMinute % 2 == 0) {
+    //         loadVideo("F.mov");
+    //     } else {
+    //         loadVideo("J.mov");
+    //     }
+    // }
+
+    // Update the movie frame
+    movie.update();
 
     // Clear the FBO
     fbo.begin();
@@ -151,14 +134,16 @@ void ofApp::draw(){
     // Draw video into the FBO
     //movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
     //movie.draw(0, 0, fbo.getWidth(), fbo.getHeight());
-    //movie.draw(0, 0, 1152, 1404);
-
-    // Draw the current video
-    if (videos[currentVideoIndex].isLoaded()) {
-        videos[currentVideoIndex].draw(0, 0, 1152, 1404);
-    }
+    movie.draw(0, 0, 1152, 1404);
 
     fbo.end();
+}
+
+//--------------------------------------------------------------
+void ofApp::draw(){
+    // Get the window dimensions
+    float windowWidth = ofGetWidth();
+    float windowHeight = ofGetHeight();
 
     // Set nearest neighbor interpolation
     fbo.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);
@@ -171,13 +156,6 @@ void ofApp::draw(){
 
     fbo.draw(0, 0, windowWidth, windowHeight);
     shader.end();
-
-    // Draw debugging info
-    ofSetColor(255);
-    ofDrawBitmapString("Current Video: " + ofToString(currentVideoIndex) 
-                      + " : " + ofToString(videos[currentVideoIndex].getPosition()), 1220, 20);
-    ofDrawBitmapString("Next Video: " + ofToString(nextVideoIndex) 
-                      , 1220, 40);
 
 }
 
@@ -201,23 +179,28 @@ void ofApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
+// void ofApp::loadVideo(const std::string& fileName) {
+//     if (currentVideoFile != fileName) {  // Load the new video only if it's different from the current one
+//         movie.stop();  // Stop the current video
+//         movie.close();  // Close the current video to free resources
+//         currentVideoFile = fileName;  // Update the current video file name
+//         movie.load(fileName);  // Load the new video
+//         movie.setLoopState(OF_LOOP_NORMAL);  // Set the video to loop
+//         movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Set nearest neighbor interpolation
+//         movie.play();  // Start playing the new video
+//     }
+// }
 
 void ofApp::loadVideo(const std::string& fileName) {
     if (currentVideoFile != fileName) {  // Only reload if the video is different
-        videos[currentVideoIndex].stop(); // Stop current playback
-        videos[currentVideoIndex].close(); // Close the current video to release resources
-
-        videos[nextVideoIndex].stop();
-        videos[nextVideoIndex].close();
+        movie.stop();                  // Stop current playback
+        movie.close();                 // Close the current video to release resources
 
         currentVideoFile = fileName;   // Update the current video file
-        if (videos[currentVideoIndex].load(fileName)) {    // Load the new video
-            videos[currentVideoIndex].setLoopState(OF_LOOP_NONE);  // Set to loop
-            videos[currentVideoIndex].getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Texture optimization
-            videos[currentVideoIndex].play();  // Start playing the video
-
-            videos[nextVideoIndex].load(fileName);
-            videos[nextVideoIndex].setLoopState(OF_LOOP_NONE);
+        if (movie.load(fileName)) {    // Load the new video
+            //movie.setLoopState(OF_LOOP_NORMAL);  // Set to loop
+            movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Texture optimization
+            movie.play();  // Start playing the video
         } else {
             ofLogError("VideoPlayer") << "Failed to load video: " << fileName;
         }
@@ -225,12 +208,12 @@ void ofApp::loadVideo(const std::string& fileName) {
 }
 
 void ofApp::resetVideo() {
-    videos[currentVideoIndex].stop();  // Stop the current video
-    videos[currentVideoIndex].close();  // Close the current video to free resources
-    videos[currentVideoIndex].load(currentVideoFile);  // Load the new video
-    videos[currentVideoIndex].setLoopState(OF_LOOP_NONE);  // Set the video to loop
-    videos[currentVideoIndex].getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Set nearest neighbor interpolation
-    videos[currentVideoIndex].play();  // Start playing the new video
+        movie.stop();  // Stop the current video
+        movie.close();  // Close the current video to free resources
+        movie.load(currentVideoFile);  // Load the new video
+        //movie.setLoopState(OF_LOOP_NORMAL);  // Set the video to loop
+        movie.getTexture().setTextureMinMagFilter(GL_NEAREST, GL_NEAREST);  // Set nearest neighbor interpolation
+        movie.play();  // Start playing the new video
 }
 
 void ofApp::updateVideo(int m) {

@@ -28,13 +28,6 @@ class ofApp : public ofBaseApp{
 		void updatePalette(int n);
 		
     ofVideoPlayer movie;  // Video player for the current video
-		std::vector<ofVideoPlayer> videos; //array of video players
-
-		int currentVideoIndex = 0;
-    int nextVideoIndex = 1;
-		// int upcomingVideoIndex = 0;
-    bool isTransitioning = false;
-
     std::string currentVideoFile;  // Store the current video file name
 		ofFbo fbo;
 		ofShader shader; //shader filter
